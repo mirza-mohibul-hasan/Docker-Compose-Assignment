@@ -32,6 +32,8 @@ The frontend depends on the backend, so it starts after the backend.
 
 ![Backend service running in the browser](images/challenge1-backend.png)
 
+---
+
 ## Challenge 2: Add a Database
 
 In this challenge, I added a PostgreSQL database service using the `postgres:15` image.
@@ -44,6 +46,8 @@ The database uses environment variables for:
 
 The backend service depends on the database service, so the backend starts after the database container starts.
 ![PostgreSQL database service configuration](images/challenge2-ps.png)
+
+---
 
 ## Challenge 3: Database Persistence
 
@@ -69,6 +73,8 @@ To verify persistence, I:
 5. Verified that the data still existed
    ![Persistent data still available after restart](images/challenge3-persistence-verify.png)
 
+---
+
 ## Challenge 4: Wait Until Database Is Ready
 
 In this challenge, I added a health check for PostgreSQL using the `pg_isready` command.
@@ -84,6 +90,8 @@ Health check configuration:
 - Retries: `5`
   ![Backend waiting for PostgreSQL health check](images/challenge4-healthcheck-wait.png)
   The backend service now depends on the database service being healthy instead of only waiting for the container to start.
+
+---
 
 ## Challenge 5: Add Redis for Caching
 
@@ -101,6 +109,8 @@ The backend service now waits until both:
 - Redis is healthy
   ![Backend waiting for PostgreSQL and Redis health checks](images/challenge5-redis-healthcheck.png)
 
+---
+
 ## Challenge 6: Survive Docker Restart
 
 In this challenge, I configured automatic container recovery using:
@@ -115,3 +125,72 @@ This ensures that all services automatically restart after:
 - Docker daemon restart
 - System reboot
   ![Services restarting after Docker daemon restart](images/challenge6-docker-restart-services.png)
+
+---
+
+# Final `docker-compose.yml`
+
+```yaml
+services:
+  database:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: app_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+```
+
+---
+
+# Final Verification
+
+The following features were successfully verified:
+
+- Backend and frontend services running correctly
+- PostgreSQL database service added successfully
+- PostgreSQL data persisted after `docker compose down`
+- PostgreSQL health checks working correctly
+- Redis health checks working correctly
+- Backend waiting for PostgreSQL and Redis health checks
+- Containers automatically restarting after Docker daemon restart
+
+---
