@@ -31,3 +31,18 @@ The frontend depends on the backend, so it starts after the backend.
 <!-- Backend -->
 
 ![alt text](image-2.png)
+
+## Challenge 2: Add a Database
+
+In this challenge, I added a PostgreSQL database service using the `postgres:15` image.
+
+The database uses environment variables for:
+
+- Username: `app_user`
+- Password: `app_password`
+- Database name: `app_db`
+
+The backend service depends on the database service, so the backend starts after the database container starts.
+
+Note: The frontend uses port `3001` instead of `3000` because port `3000` was already occupied in the Poridhi lab environment.
+![alt text](image-3.png)
