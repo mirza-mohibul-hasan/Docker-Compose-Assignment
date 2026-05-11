@@ -70,3 +70,34 @@ To verify persistence, I:
    ![alt text](image-7.png)
 5. Verified that the data still existed
    ![alt text](image-8.png)
+
+## Challenge 4: Wait Until Database Is Ready
+
+In this challenge, I added a health check for PostgreSQL using the `pg_isready` command.
+
+This ensures that the backend service waits until PostgreSQL is fully ready and accepting connections before starting.
+
+Health check configuration:
+![alt text](image-9.png)
+
+- Command: `pg_isready`
+- Interval: `5s`
+- Timeout: `5s`
+- Retries: `5`
+  ![alt text](image-10.png)
+  The backend service now depends on the database service being healthy instead of only waiting for the container to start.
+
+## Challenge 5: Add Redis for Caching
+
+In this challenge, I added a Redis caching service using the `redis:7` image.
+
+A Redis health check was added using:
+
+```bash
+redis-cli ping
+```
+
+The backend service now waits until both:
+
+- PostgreSQL is healthy
+- Redis is healthy
