@@ -102,3 +102,18 @@ The backend service now waits until both:
 - PostgreSQL is healthy
 - Redis is healthy
   ![alt text](image-11.png)
+
+## Challenge 6: Survive Docker Restart
+
+In this challenge, I configured automatic container recovery using:
+
+```yaml
+restart: unless-stopped
+```
+
+![alt text](image-12.png)
+This ensures that all services automatically restart after:
+
+- Docker daemon restart
+- System reboot
+  ![alt text](image-13.png)
