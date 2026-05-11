@@ -14,23 +14,23 @@ This assignment builds a small multi-service application step by step using Dock
 In this challenge, I created two services:
 
 - `backend` using `nginx:latest`, exposed on host port `8080`
-- `frontend` using `nginx:latest`, exposed on host port `3000`
+- `frontend` using `nginx:latest`, exposed on host port `3001`
 
 The frontend depends on the backend, so it starts after the backend.
 
-# Note: In the lab environment, port 3000 was already occupied by an internal Node.js process. Therefore, port 3001 was used for the frontend service instead.
+> **Note:** In the Poridhi lab environment, port `3000` was already occupied by an internal Node.js process. Therefore, port `3001` was used for the frontend service instead.
 
 <!-- Docker PS -->
 
-![alt text](image.png)
+![Docker Compose services running in the terminal](images/challenge1-ps.png)
 
 <!-- Frontend -->
 
-![alt text](image-1.png)
+![Frontend service running in the browser](images/challenge1-frontend.png)
 
 <!-- Backend -->
 
-![alt text](image-2.png)
+![Backend service running in the browser](images/challenge1-backend.png)
 
 ## Challenge 2: Add a Database
 
@@ -43,14 +43,12 @@ The database uses environment variables for:
 - Database name: `app_db`
 
 The backend service depends on the database service, so the backend starts after the database container starts.
-
-Note: The frontend uses port `3001` instead of `3000` because port `3000` was already occupied in the Poridhi lab environment.
-![alt text](image-3.png)
+![PostgreSQL database service configuration](images/challenge2-ps.png)
 
 ## Challenge 3: Database Persistence
 
 In this challenge, I added a named Docker volume to PostgreSQL so that database data remains persistent even after containers are removed.
-![alt text](image-4.png)
+![Persistent PostgreSQL volume configuration](images/challenge3-persistence-config.png)
 Volume used:
 
 - `postgres_data`
@@ -63,13 +61,13 @@ To verify persistence, I:
 
 1. Created a sample table
 2. Inserted test data
-   ![alt text](image-5.png)
+   ![Sample table with inserted test data](images/challenge3-persistence-before.png)
 3. Removed containers using `docker compose down`
-   ![alt text](image-6.png)
+   ![Containers stopped with docker compose down](images/challenge3-persistence-after-down.png)
 4. Started containers again
-   ![alt text](image-7.png)
+   ![Containers started again after restart](images/challenge3-persistence-after-restart.png)
 5. Verified that the data still existed
-   ![alt text](image-8.png)
+   ![Persistent data still available after restart](images/challenge3-persistence-verify.png)
 
 ## Challenge 4: Wait Until Database Is Ready
 
@@ -78,13 +76,13 @@ In this challenge, I added a health check for PostgreSQL using the `pg_isready` 
 This ensures that the backend service waits until PostgreSQL is fully ready and accepting connections before starting.
 
 Health check configuration:
-![alt text](image-9.png)
+![PostgreSQL health check configuration](images/challenge4-healthcheck-config.png)
 
 - Command: `pg_isready`
 - Interval: `5s`
 - Timeout: `5s`
 - Retries: `5`
-  ![alt text](image-10.png)
+  ![Backend waiting for PostgreSQL health check](images/challenge4-healthcheck-wait.png)
   The backend service now depends on the database service being healthy instead of only waiting for the container to start.
 
 ## Challenge 5: Add Redis for Caching
@@ -101,7 +99,7 @@ The backend service now waits until both:
 
 - PostgreSQL is healthy
 - Redis is healthy
-  ![alt text](image-11.png)
+  ![Backend waiting for PostgreSQL and Redis health checks](images/challenge5-redis-healthcheck.png)
 
 ## Challenge 6: Survive Docker Restart
 
@@ -111,9 +109,9 @@ In this challenge, I configured automatic container recovery using:
 restart: unless-stopped
 ```
 
-![alt text](image-12.png)
+![Docker restart policy configuration](images/challenge6-docker-restart.png)
 This ensures that all services automatically restart after:
 
 - Docker daemon restart
 - System reboot
-  ![alt text](image-13.png)
+  ![Services restarting after Docker daemon restart](images/challenge6-docker-restart-services.png)
