@@ -101,3 +101,4 @@ The backend service now waits until both:
 
 - PostgreSQL is healthy
 - Redis is healthy
+  ![alt text](image-11.png)
